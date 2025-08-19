@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Kid Math Game</title>
+  <style>
+    body {
+      font-family: Comic Sans MS, Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background: #f0f9ff;
+      margin: 0;
+    }
+    h1 {
+      margin-bottom: 20px;
+      color: #1d4ed8;
+      font-size: 36px;
+    }
+    #menu, #game {
+      text-align: center;
+    }
+    label, input {
+      font-size: 20px;
+      margin: 5px;
+    }
+    button {
+      font-size: 24px;
+      padding: 20px;
+      margin: 10px;
+      border: none;
+      border-radius: 12px;
+      background: #e5e7eb; /* neutral grey */
+      color: #111;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    button:hover {
+      opacity: 0.9;
+    }
+    .question {
+      font-size: 32px;
+      margin: 20px;
+    }
+    .options {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      justify-items: center;
+      margin-top: 20px;
+    }
+    .options button {
+      width: 150px;
+      height: 80px;
+    }
+    #score, #timer {
+      font-size: 24px;
+      margin: 10px;
+    }
+    .correct {
+      background: #22c55e !important; /* green */
+      color: white;
+    }
+    .wrong {
+      background: #ef4444 !important; /* red */
+      color: white;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Quick Math Game 🎲</h1>
+
+<div id="menu">
+  <label>Min: <input type="number" id="minNum" value="1"></label>
+  <label>Max: <input type="number" id="maxNum" value="9"></label>
+  <br>
+  <label>Time (minutes): <input type="number" id="timeInput" value="1"></label>
+  <br><br>
+  <button onclick="startGame()">Start Game</button>
+</div>
+
+<div id="game" style="display:none;">
+  <div id="timer">Time: 60</div>
+  <div id="score">Score: 0/0</div>
+  <div class="question" id="question"></div>
+  <div class="options" id="options"></div>
+</div>
+
+<script>
+let correctCount = 0;
+let totalCount = 0;
+let timeLeft = 60;
+let timer;
+let correctAnswer;
+let minRange = 1;
+let maxRange = 9;
+
+function startGame() {
+  minRange = parseInt(document.getElementById("minNum").value) || 1;
+  maxRange = parseInt(document.getElementById("maxNum").value) || 9;
+  let minutes = parseInt(document.getElementById("timeInput").value) || 1;
+  timeLeft = minutes * 60;
+
+  if (minRange > maxRange) [minRange, maxRange] = [maxRange, minRange];
+
+  document.getElementById("menu").style.display = "none";
+  document.getElementById("game").style.display = "block";
+  correctCount = 0;
+  totalCount = 0;
+  document.getElementById("score").innerText = "Score: 0/0";
+  document.getElementById("timer").innerText = "Time: " + timeLeft;
+
+  timer = setInterval(() => {
+    timeLeft--;
+    document.getElementById("timer").innerText = "Time: " + timeLeft;
+    if (timeLeft <= 0) {
+      clearInterval(timer);
+      endGame();
+    }
+  }, 1000);
+
+  generateQuestion();
+}
+
+function generateQuestion() {
+  let num1 = Math.floor(Math.random() * (maxRange - minRange + 1)) + minRange;
+  let num2 = Math.floor(Math.random() * (maxRange - minRange + 1)) + minRange;
+
+  // randomly decide operation
+  let operator = Math.random() < 0.5 ? '+' : '-';
+
+  if (operator === '-') {
+    if (num2 > num1) [num1, num2] = [num2, num1]; // ensure no negative
+    correctAnswer = num1 - num2;
+  } else {
+    correctAnswer = num1 + num2;
+  }
+
+  document.getElementById("question").innerText = `${num1} ${operator} ${num2} = ?`;
+
+  let options = new Set([correctAnswer]);
+  while (options.size < 4) {
+    let wrong = Math.floor(Math.random() * ((maxRange*2) - (minRange*2) + 1)) + (minRange*2);
+    if (operator === '-') wrong = Math.floor(Math.random() * (maxRange - minRange + 1));
+    options.add(wrong);
+  }
+
+  let optionButtons = "";
+  [...options].sort(() => Math.random() - 0.5).forEach(opt => {
+    optionButtons += `<button onclick="checkAnswer(this, ${opt})">${opt}</button>`;
+  });
+  document.getElementById("options").innerHTML = optionButtons;
+}
+
+function checkAnswer(button, answer) {
+  totalCount++;
+  let buttons = document.querySelectorAll("#options button");
+  if (answer === correctAnswer) {
+    button.classList.add("correct");
+    correctCount++;
+  } else {
+    button.classList.add("wrong");
+    buttons.forEach(btn => {
+      if (parseInt(btn.innerText) === correctAnswer) {
+        btn.classList.add("correct");
+      }
+    });
+  }
+  document.getElementById("score").innerText = `Score: ${correctCount}/${totalCount}`;
+  setTimeout(() => generateQuestion(), 1000);
+}
+
+function endGame() {
+  document.getElementById("game").innerHTML = 
+    `<h2>Game Over!</h2><p>Your Score: ${correctCount}/${totalCount}</p>
+     <button onclick="location.reload()">Play Again</button>`;
+}
+</script>
+
+</body>
+</html>
