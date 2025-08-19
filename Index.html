@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kid Math Game</title>
   <style>
     body {
@@ -13,22 +14,30 @@
       height: 100vh;
       background: #f0f9ff;
       margin: 0;
+      padding: 10px;
     }
     h1 {
       margin-bottom: 20px;
       color: #1d4ed8;
-      font-size: 36px;
+      font-size: clamp(28px, 6vw, 48px); /* responsive */
+      text-align: center;
     }
     #menu, #game {
       text-align: center;
+      width: 100%;
+      max-width: 500px;
     }
     label, input {
-      font-size: 20px;
+      font-size: clamp(16px, 4vw, 24px);
       margin: 5px;
     }
+    input {
+      width: 70px;
+      text-align: center;
+    }
     button {
-      font-size: 24px;
-      padding: 20px;
+      font-size: clamp(20px, 5vw, 32px);
+      padding: clamp(12px, 3vw, 20px);
       margin: 10px;
       border: none;
       border-radius: 12px;
@@ -41,7 +50,7 @@
       opacity: 0.9;
     }
     .question {
-      font-size: 32px;
+      font-size: clamp(26px, 7vw, 42px);
       margin: 20px;
     }
     .options {
@@ -52,11 +61,11 @@
       margin-top: 20px;
     }
     .options button {
-      width: 150px;
-      height: 80px;
+      width: clamp(120px, 40vw, 180px);
+      height: clamp(60px, 20vw, 100px);
     }
     #score, #timer {
-      font-size: 24px;
+      font-size: clamp(18px, 4.5vw, 28px);
       margin: 10px;
     }
     .correct {
@@ -175,10 +184,11 @@ function checkAnswer(button, answer) {
 
 function endGame() {
   document.getElementById("game").innerHTML = 
-    `<h2>Game Over!</h2><p>Your Score: ${correctCount}/${totalCount}</p>
+    `<h2 style="font-size:clamp(26px,6vw,40px)">Game Over!</h2>
+     <p style="font-size:clamp(20px,5vw,28px)">Your Score: ${correctCount}/${totalCount}</p>
      <button onclick="location.reload()">Play Again</button>`;
 }
 </script>
 
 </body>
-</html>
+  </html> 
