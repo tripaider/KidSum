@@ -10,29 +10,25 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      min-height: 100vh;
+      height: 100vh;
       background: #f0f9ff;
       margin: 0;
-      padding: 10px;
+      transition: background 0.5s;
     }
     h1 {
       margin-bottom: 20px;
       color: #1d4ed8;
-      font-size: clamp(28px, 6vw, 40px);
+      font-size: clamp(24px, 5vw, 40px);
       text-align: center;
     }
     #menu, #game {
       text-align: center;
-      width: 100%;
+      width: 90%;
       max-width: 600px;
     }
     label, input {
-      font-size: clamp(18px, 4vw, 22px);
+      font-size: clamp(18px, 4vw, 24px);
       margin: 5px;
-    }
-    input {
-      width: 70px;
-      text-align: center;
     }
     button {
       font-size: clamp(20px, 5vw, 28px);
@@ -40,10 +36,13 @@
       margin: 10px;
       border: none;
       border-radius: 12px;
-      background: #e5e7eb; /* neutral grey */
+      background: #e5e7eb;
       color: #111;
       cursor: pointer;
       transition: all 0.3s;
+    }
+    button:hover {
+      opacity: 0.9;
     }
     .question {
       font-size: clamp(26px, 6vw, 36px);
@@ -57,20 +56,27 @@
       margin-top: 20px;
     }
     .options button {
-      width: 140px;
+      width: 100%;
+      max-width: 200px;
       height: 80px;
     }
-    #score, #timer, #questionTimer {
-      font-size: clamp(20px, 4vw, 26px);
-      margin: 8px;
+    #score, #timer {
+      font-size: clamp(20px, 4vw, 28px);
+      margin: 10px;
     }
     .correct {
-      background: #86efac !important; /* light green */
-      color: #065f46;
+      background: #22c55e !important;
+      color: white;
     }
     .wrong {
-      background: #fca5a5 !important; /* light red */
-      color: #7f1d1d;
+      background: #ef4444 !important;
+      color: white;
+    }
+    .bg-correct {
+      background: #bbf7d0 !important; /* light green */
+    }
+    .bg-wrong {
+      background: #fecaca !important; /* light red */
     }
   </style>
 </head>
@@ -83,15 +89,12 @@
   <label>Max: <input type="number" id="maxNum" value="9"></label>
   <br>
   <label>Time (minutes): <input type="number" id="timeInput" value="1"></label>
-  <br>
-  <label>Per Question Time (secs): <input type="number" id="qTimeInput" value="5"></label>
   <br><br>
   <button onclick="startGame()">Start Game</button>
 </div>
 
 <div id="game" style="display:none;">
-  <div id="timer">Game Time: 60</div>
-  <div id="questionTimer">Question Time: 5</div>
+  <div id="timer">Time: 60</div>
   <div id="score">Score: 0/0</div>
   <div class="question" id="question"></div>
   <div class="options" id="options"></div>
@@ -101,18 +104,15 @@
 let correctCount = 0;
 let totalCount = 0;
 let timeLeft = 60;
-let timer, questionTimer;
+let timer;
 let correctAnswer;
 let minRange = 1;
 let maxRange = 9;
-let perQuestionTime = 5;
-let qTimeLeft = 5;
 
 function startGame() {
   minRange = parseInt(document.getElementById("minNum").value) || 1;
   maxRange = parseInt(document.getElementById("maxNum").value) || 9;
   let minutes = parseInt(document.getElementById("timeInput").value) || 1;
-  perQuestionTime = parseInt(document.getElementById("qTimeInput").value) || 5;
   timeLeft = minutes * 60;
 
   if (minRange > maxRange) [minRange, maxRange] = [maxRange, minRange];
@@ -122,14 +122,13 @@ function startGame() {
   correctCount = 0;
   totalCount = 0;
   document.getElementById("score").innerText = "Score: 0/0";
-  document.getElementById("timer").innerText = "Game Time: " + timeLeft;
+  document.getElementById("timer").innerText = "Time: " + timeLeft;
 
   timer = setInterval(() => {
     timeLeft--;
-    document.getElementById("timer").innerText = "Game Time: " + timeLeft;
+    document.getElementById("timer").innerText = "Time: " + timeLeft;
     if (timeLeft <= 0) {
       clearInterval(timer);
-      clearInterval(questionTimer);
       endGame();
     }
   }, 1000);
@@ -138,43 +137,47 @@ function startGame() {
 }
 
 function generateQuestion() {
-  clearInterval(questionTimer);
-
   let num1 = Math.floor(Math.random() * (maxRange - minRange + 1)) + minRange;
   let num2 = Math.floor(Math.random() * (maxRange - minRange + 1)) + minRange;
+
   let operator = Math.random() < 0.5 ? '+' : '-';
 
-  // ensure subtraction is non-negative
-  if (operator === '-' && num2 > num1) [num1, num2] = [num2, num1];
+  if (operator === '-') {
+    if (num2 > num1) [num1, num2] = [num2, num1];
+  }
 
-  let pattern = Math.floor(Math.random() * 3); // choose 3 question styles
+  let format = Math.floor(Math.random() * 3); // 0, 1, 2 for variations
+  let questionText = "";
+  
   if (operator === '+') {
-    if (pattern === 0) {
+    if (format === 0) { // x + y = ?
       correctAnswer = num1 + num2;
-      document.getElementById("question").innerText = `${num1} + ${num2} = ?`;
-    } else if (pattern === 1) {
+      questionText = `${num1} + ${num2} = ?`;
+    } else if (format === 1) { // x + ? = y
       correctAnswer = num2;
-      document.getElementById("question").innerText = `${num1} + ? = ${num1 + num2}`;
-    } else {
+      questionText = `${num1} + ? = ${num1 + num2}`;
+    } else { // ? + x = y
       correctAnswer = num1;
-      document.getElementById("question").innerText = `? + ${num2} = ${num1 + num2}`;
+      questionText = `? + ${num2} = ${num1 + num2}`;
     }
   } else {
-    if (pattern === 0) {
+    if (format === 0) { // x - y = ?
       correctAnswer = num1 - num2;
-      document.getElementById("question").innerText = `${num1} - ${num2} = ?`;
-    } else if (pattern === 1) {
+      questionText = `${num1} - ${num2} = ?`;
+    } else if (format === 1) { // x - ? = y
       correctAnswer = num2;
-      document.getElementById("question").innerText = `${num1} - ? = ${num1 - num2}`;
-    } else {
+      questionText = `${num1} - ? = ${num1 - num2}`;
+    } else { // ? - x = y
       correctAnswer = num1;
-      document.getElementById("question").innerText = `? - ${num2} = ${num1 - num2}`;
+      questionText = `? - ${num2} = ${num1 - num2}`;
     }
   }
 
+  document.getElementById("question").innerText = questionText;
+
   let options = new Set([correctAnswer]);
   while (options.size < 4) {
-    let wrong = Math.floor(Math.random() * (maxRange * 2));
+    let wrong = Math.floor(Math.random() * (maxRange * 2 + 1));
     options.add(wrong);
   }
 
@@ -183,34 +186,16 @@ function generateQuestion() {
     optionButtons += `<button onclick="checkAnswer(this, ${opt})">${opt}</button>`;
   });
   document.getElementById("options").innerHTML = optionButtons;
-
-  // reset per-question timer
-  qTimeLeft = perQuestionTime;
-  document.getElementById("questionTimer").innerText = "Question Time: " + qTimeLeft;
-
-  questionTimer = setInterval(() => {
-    qTimeLeft--;
-    document.getElementById("questionTimer").innerText = "Question Time: " + qTimeLeft;
-    if (qTimeLeft <= 0) {
-      clearInterval(questionTimer);
-      totalCount++;
-      let buttons = document.querySelectorAll("#options button");
-      buttons.forEach(btn => {
-        if (parseInt(btn.innerText) === correctAnswer) btn.classList.add("correct");
-      });
-      document.getElementById("score").innerText = `Score: ${correctCount}/${totalCount}`;
-      setTimeout(() => generateQuestion(), 1000);
-    }
-  }, 1000);
 }
 
 function checkAnswer(button, answer) {
-  clearInterval(questionTimer);
   totalCount++;
   let buttons = document.querySelectorAll("#options button");
   if (answer === correctAnswer) {
     button.classList.add("correct");
     correctCount++;
+    document.body.classList.add("bg-correct");
+    setTimeout(() => document.body.classList.remove("bg-correct"), 500);
   } else {
     button.classList.add("wrong");
     buttons.forEach(btn => {
@@ -218,6 +203,8 @@ function checkAnswer(button, answer) {
         btn.classList.add("correct");
       }
     });
+    document.body.classList.add("bg-wrong");
+    setTimeout(() => document.body.classList.remove("bg-wrong"), 500);
   }
   document.getElementById("score").innerText = `Score: ${correctCount}/${totalCount}`;
   setTimeout(() => generateQuestion(), 1000);
