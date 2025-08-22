@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- important for mobile scaling -->
   <title>Kid Math Game</title>
   <style>
     body {
@@ -10,33 +11,42 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      height: 100vh;
+      min-height: 100vh;
       background: #f0f9ff;
       margin: 0;
       padding: 10px;
+      transition: background 0.5s;
     }
+
     h1 {
       margin-bottom: 20px;
       color: #1d4ed8;
-      font-size: clamp(28px, 6vw, 48px); /* responsive */
+      font-size: clamp(28px, 8vw, 48px);
       text-align: center;
     }
+
     #menu, #game {
       text-align: center;
       width: 100%;
       max-width: 500px;
     }
+
     label, input {
-      font-size: clamp(16px, 4vw, 24px);
-      margin: 5px;
+      font-size: clamp(16px, 4.5vw, 24px);
+      margin: 8px;
+      display: block;
     }
+
     input {
-      width: 70px;
+      width: clamp(60px, 20vw, 90px);
       text-align: center;
+      font-size: clamp(18px, 5vw, 22px);
+      padding: 6px;
     }
+
     button {
-      font-size: clamp(20px, 5vw, 32px);
-      padding: clamp(12px, 3vw, 20px);
+      font-size: clamp(20px, 6vw, 32px);
+      padding: clamp(12px, 4vw, 18px);
       margin: 10px;
       border: none;
       border-radius: 12px;
@@ -44,14 +54,19 @@
       color: #111;
       cursor: pointer;
       transition: all 0.3s;
+      width: 100%;
+      max-width: 250px;
     }
+
     button:hover {
       opacity: 0.9;
     }
+
     .question {
-      font-size: clamp(26px, 7vw, 42px);
+      font-size: clamp(26px, 8vw, 42px);
       margin: 20px;
     }
+
     .options {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -59,99 +74,36 @@
       justify-items: center;
       margin-top: 20px;
     }
+
     .options button {
-      width: clamp(120px, 40vw, 180px);
-      height: clamp(60px, 20vw, 100px);
+      width: 100%;
+      max-width: 180px;
+      height: clamp(60px, 22vw, 100px);
     }
+
     #score, #timer {
-      font-size: clamp(18px, 4.5vw, 28px);
+      font-size: clamp(18px, 5vw, 28px);
       margin: 10px;
     }
+
     .correct {
       background: #22c55e !important; /* green */
       color: white;
     }
+
     .wrong {
       background: #ef4444 !important; /* red */
       color: white;
     }
-  </style>
-  <!--<style>
-    body {
-      font-family: Comic Sans MS, Arial, sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      background: #f0f9ff;
-      margin: 0;
-      transition: background 0.5s;
-    }
-    h1 {
-      margin-bottom: 20px;
-      color: #1d4ed8;
-      font-size: clamp(24px, 4vw, 40px);
-      text-align: center;
-    }
-    #menu, #game {
-      text-align: center;
-      width: 90%;
-      max-width: 600px;
-    }
-    label, input {
-      font-size: clamp(18px, 4vw, 24px);
-      margin: 5px;
-    }
-    button {
-      font-size: clamp(20px, 5vw, 28px);
-      padding: 15px;
-      margin: 10px;
-      border: none;
-      border-radius: 12px;
-      background: #e5e7eb;
-      color: #111;
-      cursor: pointer;
-      transition: all 0.3s;
-    }
-    button:hover {
-      opacity: 0.9;
-    }
-    .question {
-      font-size: clamp(26px, 6vw, 36px);
-      margin: 20px;
-    }
-    .options {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 15px;
-      justify-items: center;
-      margin-top: 20px;
-    }
-    .options button {
-      width: 100%;
-      max-width: 200px;
-      height: 80px;
-    }
-    #score, #timer {
-      font-size: clamp(20px, 4vw, 28px);
-      margin: 10px;
-    }
-    .correct {
-      background: #22c55e !important;
-      color: white;
-    }
-    .wrong {
-      background: #ef4444 !important;
-      color: white;
-    }
+
     .bg-correct {
       background: #bbf7d0 !important; /* light green */
     }
+
     .bg-wrong {
       background: #fecaca !important; /* light red */
     }
-  </style>-->
+  </style>
 </head>
 <body>
 
@@ -159,11 +111,9 @@
 
 <div id="menu">
   <label>Min: <input type="number" id="minNum" value="1"></label>
-  <br>
   <label>Max: <input type="number" id="maxNum" value="9"></label>
-  <br>
   <label>Time (minutes): <input type="number" id="timeInput" value="1"></label>
-  <br><br>
+  <br>
   <button onclick="startGame()">Start Game</button>
 </div>
 
@@ -224,24 +174,24 @@ function generateQuestion() {
   let questionText = "";
   
   if (operator === '+') {
-    if (format === 0) { // x + y = ?
+    if (format === 0) {
       correctAnswer = num1 + num2;
       questionText = `${num1} + ${num2} = ?`;
-    } else if (format === 1) { // x + ? = y
+    } else if (format === 1) {
       correctAnswer = num2;
       questionText = `${num1} + ? = ${num1 + num2}`;
-    } else { // ? + x = y
+    } else {
       correctAnswer = num1;
       questionText = `? + ${num2} = ${num1 + num2}`;
     }
   } else {
-    if (format === 0) { // x - y = ?
+    if (format === 0) {
       correctAnswer = num1 - num2;
       questionText = `${num1} - ${num2} = ?`;
-    } else if (format === 1) { // x - ? = y
+    } else if (format === 1) {
       correctAnswer = num2;
       questionText = `${num1} - ? = ${num1 - num2}`;
-    } else { // ? - x = y
+    } else {
       correctAnswer = num1;
       questionText = `? - ${num2} = ${num1 - num2}`;
     }
