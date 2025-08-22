@@ -13,6 +13,79 @@
       height: 100vh;
       background: #f0f9ff;
       margin: 0;
+      padding: 10px;
+    }
+    h1 {
+      margin-bottom: 20px;
+      color: #1d4ed8;
+      font-size: clamp(28px, 6vw, 48px); /* responsive */
+      text-align: center;
+    }
+    #menu, #game {
+      text-align: center;
+      width: 100%;
+      max-width: 500px;
+    }
+    label, input {
+      font-size: clamp(16px, 4vw, 24px);
+      margin: 5px;
+    }
+    input {
+      width: 70px;
+      text-align: center;
+    }
+    button {
+      font-size: clamp(20px, 5vw, 32px);
+      padding: clamp(12px, 3vw, 20px);
+      margin: 10px;
+      border: none;
+      border-radius: 12px;
+      background: #e5e7eb; /* neutral grey */
+      color: #111;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    button:hover {
+      opacity: 0.9;
+    }
+    .question {
+      font-size: clamp(26px, 7vw, 42px);
+      margin: 20px;
+    }
+    .options {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      justify-items: center;
+      margin-top: 20px;
+    }
+    .options button {
+      width: clamp(120px, 40vw, 180px);
+      height: clamp(60px, 20vw, 100px);
+    }
+    #score, #timer {
+      font-size: clamp(18px, 4.5vw, 28px);
+      margin: 10px;
+    }
+    .correct {
+      background: #22c55e !important; /* green */
+      color: white;
+    }
+    .wrong {
+      background: #ef4444 !important; /* red */
+      color: white;
+    }
+  </style>
+  <!--<style>
+    body {
+      font-family: Comic Sans MS, Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background: #f0f9ff;
+      margin: 0;
       transition: background 0.5s;
     }
     h1 {
@@ -78,7 +151,7 @@
     .bg-wrong {
       background: #fecaca !important; /* light red */
     }
-  </style>
+  </style>-->
 </head>
 <body>
 
