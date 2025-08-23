@@ -2,229 +2,269 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Math Game</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Math Quiz</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
   <style>
+    body {
+      padding: 1rem;
+    }
+    .quiz-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .answers {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      width: 100%;
+      max-width: 400px;
+      margin-top: 1.5rem;
+    }
     .answer-btn {
       width: 100%;
       height: 80px;
-      font-size: 6vw;
+      font-size: 1.5rem;
     }
     .question {
-      font-size: 8vw;
-      margin-bottom: 1rem;
-    }
-    .timer, .score {
-      font-size: 5vw;
-      margin-top: 0.5rem;
-    }
-    @media (max-width: 768px) {
-      .answer-btn { font-size: 8vw; }
-      .question { font-size: 10vw; }
-      .timer, .score { font-size: 7vw; }
+      font-size: 2rem;
+      margin: 1rem 0;
+      text-align: center;
     }
   </style>
 </head>
-<body class="section">
-
+<body>
   <!-- Landing Page -->
-  <div id="landingPage" class="container has-text-centered">
-    <h1 class="title is-3">Welcome to Math Game</h1>
+  <section id="landing" class="section">
+    <div class="container">
+      <h1 class="title has-text-centered">Math Quiz Setup</h1>
+      <div class="box">
+        <form id="setupForm">
+          <div class="field is-horizontal">
+            <div class="field-label is-normal">
+              <label class="label">Min Number</label>
+            </div>
+            <div class="field-body">
+              <div class="field">
+                <div class="control">
+                  <input class="input" type="number" id="minRange" value="1">
+                </div>
+              </div>
+            </div>
+          </div>
 
-    <div class="field">
-      <label class="label">Min Number</label>
-      <div class="control">
-        <input id="minNumber" class="input" type="number" value="1">
+          <div class="field is-horizontal">
+            <div class="field-label is-normal">
+              <label class="label">Max Number</label>
+            </div>
+            <div class="field-body">
+              <div class="field">
+                <div class="control">
+                  <input class="input" type="number" id="maxRange" value="9">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="field is-horizontal">
+            <div class="field-label is-normal">
+              <label class="label">Game Time (mins)</label>
+            </div>
+            <div class="field-body">
+              <div class="field">
+                <div class="control">
+                  <input class="input" type="number" id="gameTime" value="1">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="field is-horizontal">
+            <div class="field-label is-normal">
+              <label class="label">Question Timer (secs)</label>
+            </div>
+            <div class="field-body">
+              <div class="field">
+                <div class="control">
+                  <input class="input" type="number" id="questionTime" value="5">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="field is-grouped is-grouped-centered">
+            <div class="control">
+              <button type="submit" class="button is-primary is-large">Start Quiz</button>
+            </div>
+          </div>
+        </form>
       </div>
     </div>
+  </section>
 
-    <div class="field">
-      <label class="label">Max Number</label>
-      <div class="control">
-        <input id="maxNumber" class="input" type="number" value="9">
+  <!-- Quiz Page -->
+  <section id="quiz" class="section is-hidden">
+    <div class="quiz-container">
+      <div class="tags has-addons mb-3">
+        <span class="tag is-dark is-medium">Time Left</span>
+        <span id="timer" class="tag is-info is-medium">0</span>
       </div>
+      <div class="tags has-addons mb-3">
+        <span class="tag is-dark is-medium">Question Time</span>
+        <span id="qTimer" class="tag is-warning is-medium">0</span>
+      </div>
+      <div class="tags has-addons mb-3">
+        <span class="tag is-dark is-medium">Score</span>
+        <span id="score" class="tag is-success is-medium">0/0</span>
+      </div>
+      <div id="question" class="question"></div>
+      <div class="answers" id="answers"></div>
     </div>
-
-    <div class="field">
-      <label class="label">Game Duration (minutes)</label>
-      <div class="control">
-        <input id="gameTime" class="input" type="number" value="1">
-      </div>
-    </div>
-
-    <div class="field">
-      <label class="label">Question Timer (seconds)</label>
-      <div class="control">
-        <input id="questionTime" class="input" type="number" value="5">
-      </div>
-    </div>
-
-    <button class="button is-primary is-large mt-4" onclick="startGame()">Start Game</button>
-  </div>
-
-  <!-- Game Page -->
-  <div id="gamePage" class="container has-text-centered is-hidden">
-    <div id="timer" class="timer"></div>
-    <div id="questionTimer" class="timer"></div>
-    <div id="score" class="score"></div>
-    <div id="question" class="question"></div>
-
-    <div class="columns is-multiline">
-      <div class="column is-half">
-        <button id="btn0" class="button is-info answer-btn" onclick="checkAnswer(0)"></button>
-      </div>
-      <div class="column is-half">
-        <button id="btn1" class="button is-info answer-btn" onclick="checkAnswer(1)"></button>
-      </div>
-      <div class="column is-half">
-        <button id="btn2" class="button is-info answer-btn" onclick="checkAnswer(2)"></button>
-      </div>
-      <div class="column is-half">
-        <button id="btn3" class="button is-info answer-btn" onclick="checkAnswer(3)"></button>
-      </div>
-    </div>
-  </div>
+  </section>
 
   <script>
-    let minNumber, maxNumber, gameDuration, questionDuration;
-    let score = 0, total = 0;
-    let correctAnswer, gameTimer, questionTimer;
-    let gameOver = false;
+    const landing = document.getElementById("landing");
+    const quiz = document.getElementById("quiz");
+    const form = document.getElementById("setupForm");
+    const questionEl = document.getElementById("question");
+    const answersEl = document.getElementById("answers");
+    const timerEl = document.getElementById("timer");
+    const qTimerEl = document.getElementById("qTimer");
+    const scoreEl = document.getElementById("score");
+
+    let minRange, maxRange, gameTime, questionTime;
+    let correct = 0, total = 0;
+    let gameInterval, questionInterval;
+    let timeLeft, qTimeLeft;
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      minRange = parseInt(document.getElementById("minRange").value) || 1;
+      maxRange = parseInt(document.getElementById("maxRange").value) || 9;
+      gameTime = (parseInt(document.getElementById("gameTime").value) || 1) * 60;
+      questionTime = parseInt(document.getElementById("questionTime").value) || 5;
+      
+      landing.classList.add("is-hidden");
+      quiz.classList.remove("is-hidden");
+
+      startGame();
+    });
 
     function startGame() {
-      minNumber = parseInt(document.getElementById('minNumber').value) || 1;
-      maxNumber = parseInt(document.getElementById('maxNumber').value) || 9;
-      gameDuration = parseInt(document.getElementById('gameTime').value) * 60 || 60;
-      questionDuration = parseInt(document.getElementById('questionTime').value) || 5;
-
-      score = 0; total = 0; gameOver = false;
-
-      document.getElementById('landingPage').classList.add('is-hidden');
-      document.getElementById('gamePage').classList.remove('is-hidden');
-
-      document.getElementById('score').innerText = `Score: 0/0`;
-
-      startGameTimer();
+      correct = 0; total = 0;
+      timeLeft = gameTime;
+      scoreEl.textContent = `${correct}/${total}`;
+      timerEl.textContent = timeLeft;
+      gameInterval = setInterval(() => {
+        timeLeft--;
+        timerEl.textContent = timeLeft;
+        if (timeLeft <= 0) {
+          clearInterval(gameInterval);
+          clearInterval(questionInterval);
+          questionEl.textContent = "Game Over!";
+          answersEl.innerHTML = "";
+        }
+      }, 1000);
       nextQuestion();
     }
 
-    function startGameTimer() {
-      let timeLeft = gameDuration;
-      document.getElementById('timer').innerText = `Time Left: ${timeLeft}s`;
-      gameTimer = setInterval(() => {
-        timeLeft--;
-        document.getElementById('timer').innerText = `Time Left: ${timeLeft}s`;
-        if (timeLeft <= 0) endGame();
-      }, 1000);
-    }
-
-    function startQuestionTimer() {
-      let qTime = questionDuration;
-      document.getElementById('questionTimer').innerText = `Question Time: ${qTime}s`;
-      questionTimer = setInterval(() => {
-        if (gameOver) return;
-        qTime--;
-        document.getElementById('questionTimer').innerText = `Question Time: ${qTime}s`;
-        if (qTime <= 0) {
-          clearInterval(questionTimer);
-          markUnanswered();
-        }
-      }, 1000);
-    }
-
     function nextQuestion() {
-      if (gameOver) return;
-      clearInterval(questionTimer);
-
-      const num1 = Math.floor(Math.random() * (maxNumber - minNumber + 1)) + minNumber;
-      const num2 = Math.floor(Math.random() * (maxNumber - minNumber + 1)) + minNumber;
-      const isAddition = Math.random() < 0.5;
-
-      let displayFormat = Math.floor(Math.random() * 3);
-      let questionText = "";
-      if (isAddition) {
-        correctAnswer = num1 + num2;
-        if (displayFormat === 0) questionText = `${num1} + ? = ${correctAnswer}`;
-        else if (displayFormat === 1) questionText = `? + ${num2} = ${correctAnswer}`;
-        else questionText = `${num1} + ${num2} = ?`;
-      } else {
-        let a = Math.max(num1, num2), b = Math.min(num1, num2);
-        correctAnswer = a - b;
-        if (displayFormat === 0) questionText = `${a} - ? = ${correctAnswer}`;
-        else if (displayFormat === 1) questionText = `? - ${b} = ${correctAnswer}`;
-        else questionText = `${a} - ${b} = ?`;
-      }
-
-      document.getElementById('question').innerText = questionText;
-
-      let answers = [correctAnswer];
-      while (answers.length < 4) {
-        let wrong = correctAnswer + Math.floor(Math.random() * 10) - 5;
-        if (wrong >= minNumber && wrong <= maxNumber * 2 && !answers.includes(wrong)) {
-          answers.push(wrong);
+      clearInterval(questionInterval);
+      qTimeLeft = questionTime;
+      qTimerEl.textContent = qTimeLeft;
+      questionInterval = setInterval(() => {
+        qTimeLeft--;
+        qTimerEl.textContent = qTimeLeft;
+        if (qTimeLeft <= 0) {
+          clearInterval(questionInterval);
+          total++;
+          scoreEl.textContent = `${correct}/${total}`;
+          nextQuestion();
         }
-      }
-      answers.sort(() => Math.random() - 0.5);
+      }, 1000);
 
-      answers.forEach((ans, i) => {
-        let btn = document.getElementById(`btn${i}`);
-        btn.innerText = ans;
-        btn.className = "button is-light answer-btn";
-        btn.disabled = false;
-      });
-
-      startQuestionTimer();
+      generateQuestion();
     }
 
-    function checkAnswer(i) {
-      if (gameOver) return;
-      clearInterval(questionTimer);
+    function generateQuestion() {
+      let a = randomInt(minRange, maxRange);
+      let b = randomInt(minRange, maxRange);
+      let operator = Math.random() < 0.5 ? "+" : "-";
+      let expressionType = randomInt(1, 3);
+      let correctAnswer;
+
+      if (operator === "-" && a < b) [a, b] = [b, a];
+
+      if (operator === "+") {
+        let result = a + b;
+        if (expressionType === 1) {
+          questionEl.textContent = `${a} + ? = ${result}`;
+          correctAnswer = b;
+        } else if (expressionType === 2) {
+          questionEl.textContent = `? + ${b} = ${result}`;
+          correctAnswer = a;
+        } else {
+          questionEl.textContent = `${a} + ${b} = ?`;
+          correctAnswer = result;
+        }
+      } else {
+        let result = a - b;
+        if (expressionType === 1) {
+          questionEl.textContent = `${a} - ? = ${result}`;
+          correctAnswer = b;
+        } else if (expressionType === 2) {
+          questionEl.textContent = `? - ${b} = ${result}`;
+          correctAnswer = a;
+        } else {
+          questionEl.textContent = `${a} - ${b} = ?`;
+          correctAnswer = result;
+        }
+      }
+
+      renderAnswers(correctAnswer);
+    }
+
+    function renderAnswers(correctAnswer) {
+      answersEl.innerHTML = "";
+      let options = new Set([correctAnswer]);
+      while (options.size < 4) {
+        options.add(randomInt(minRange, maxRange));
+      }
+      let shuffled = Array.from(options).sort(() => Math.random() - 0.5);
+
+      shuffled.forEach(opt => {
+        let btn = document.createElement("button");
+        btn.className = "button is-light is-large is-rounded answer-btn";
+        btn.textContent = opt;
+        btn.onclick = () => checkAnswer(btn, opt, correctAnswer);
+        answersEl.appendChild(btn);
+      });
+    }
+
+    function checkAnswer(btn, chosen, correctAnswer) {
       total++;
-      const btn = document.getElementById(`btn${i}`);
-      if (parseInt(btn.innerText) === correctAnswer) {
-        score++;
+      if (chosen === correctAnswer) {
+        correct++;
+        btn.classList.remove("is-light");
         btn.classList.add("is-success");
         document.body.style.backgroundColor = "#d4edda";
       } else {
+        btn.classList.remove("is-light");
         btn.classList.add("is-danger");
         document.body.style.backgroundColor = "#f8d7da";
-        for (let j = 0; j < 4; j++) {
-          if (parseInt(document.getElementById(`btn${j}`).innerText) === correctAnswer) {
-            document.getElementById(`btn${j}`).classList.add("is-success");
-          }
-        }
       }
-      document.getElementById('score').innerText = `Score: ${score}/${total}`;
+      scoreEl.textContent = `${correct}/${total}`;
+      clearInterval(questionInterval);
       setTimeout(() => {
-        document.body.style.backgroundColor = "";
+        document.body.style.backgroundColor = "white";
         nextQuestion();
-      }, 1000);
+      }, 700);
     }
 
-    function markUnanswered() {
-      total++;
-      document.body.style.backgroundColor = "#f8d7da";
-      for (let j = 0; j < 4; j++) {
-        if (parseInt(document.getElementById(`btn${j}`).innerText) === correctAnswer) {
-          document.getElementById(`btn${j}`).classList.add("is-success");
-        }
-      }
-      document.getElementById('score').innerText = `Score: ${score}/${total}`;
-      setTimeout(() => {
-        document.body.style.backgroundColor = "";
-        nextQuestion();
-      }, 1000);
-    }
-
-    function endGame() {
-      gameOver = true;
-      clearInterval(gameTimer);
-      clearInterval(questionTimer);
-      document.getElementById('question').innerText = "Game Over!";
-      for (let i = 0; i < 4; i++) {
-        document.getElementById(`btn${i}`).disabled = true;
-      }
+    function randomInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
     }
   </script>
 </body>
-  </html>
+</html>
